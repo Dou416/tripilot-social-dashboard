@@ -1,0 +1,6 @@
+requests>=2.31.0
+pyyaml>=6.0
+python-dotenv>=1.0.0
+twikit>=2.0.0
+TikTokApi>=6.3.0
+xhs>=0.2.0

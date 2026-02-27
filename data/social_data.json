@@ -1,0 +1,25 @@
+{
+  "collected_at": "2026-02-27T13:23:27.204905+00:00",
+  "platforms": {
+    "reddit": {
+      "account": "Tripilot2025",
+      "profile_url": "https://reddit.com/user/Tripilot2025",
+      "stats": {
+        "post_count": 1,
+        "total_score": 0,
+        "total_comments": 5
+      },
+      "posts": [
+        {
+          "title": "I’m building an AI travel agent to help foreigners explore China. AMA",
+          "url": "https://reddit.com/r/travelchina/comments/1on8gx6/im_building_an_ai_travel_agent_to_help_foreigners/",
+          "subreddit": "travelchina",
+          "score": 0,
+          "comments": 5,
+          "upvote_ratio": 0.4,
+          "date": "2025-11-03T10:41:27+00:00"
+        }
+      ]
+    }
+  }
+}

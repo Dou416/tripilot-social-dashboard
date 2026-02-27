@@ -1,0 +1,14 @@
+reddit:
+  username: "Tripilot2025"
+
+twitter:
+  username: "TripilotAI"
+  # auth in .env: TWITTER_USERNAME, TWITTER_PASSWORD
+
+tiktok:
+  username: "tripilot.ai"
+  # auth in .env: TIKTOK_MS_TOKEN (optional)
+
+xiaohongshu:
+  user_id: ""  # Get from profile URL: https://www.xiaohongshu.com/user/profile/XXXXXX
+  # auth in .env: XHS_COOKIE

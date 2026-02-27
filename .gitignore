@@ -1,0 +1,4 @@
+.env
+.twitter_cookies.json
+__pycache__/
+*.pyc

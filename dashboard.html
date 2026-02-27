@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tripilot Social Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --bg-primary: #0a0a0f;
+  --bg-secondary: #12121a;
+  --bg-card: rgba(255, 255, 255, 0.04);
+  --bg-card-hover: rgba(255, 255, 255, 0.07);
+  --border-subtle: rgba(255, 255, 255, 0.06);
+  --border-light: rgba(255, 255, 255, 0.1);
+  --text-primary: #f0f0f5;
+  --text-secondary: #8a8a9a;
+  --text-muted: #55556a;
+  --reddit: #FF4500;
+  --twitter: #ffffff;
+  --tiktok: #00F2EA;
+  --xiaohongshu: #FF2442;
+  --reddit-bg: rgba(255, 69, 0, 0.12);
+  --twitter-bg: rgba(255, 255, 255, 0.08);
+  --tiktok-bg: rgba(0, 242, 234, 0.10);
+  --xiaohongshu-bg: rgba(255, 36, 66, 0.12);
+  --radius: 16px;
+  --radius-sm: 10px;
+  --shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  min-height: 100vh;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Background gradient orbs */
+body::before {
+  content: '';
+  position: fixed;
+  top: -200px;
+  right: -200px;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(255, 69, 0, 0.06) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  bottom: -200px;
+  left: -200px;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(0, 242, 234, 0.05) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.container {
+  max-width: 1360px;
+  margin: 0 auto;
+  padding: 0 24px;
+  position: relative;
+  z-index: 1;
+}
+
+/* ── Header ── */
+.header {
+  padding: 40px 0 32px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  border-bottom: 1px solid var(--border-subtle);
+  margin-bottom: 36px;
+}
+
+.header-left h1 {
+  font-size: 1.75rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  background: linear-gradient(135deg, #f0f0f5 0%, #8a8a9a 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.header-left .subtitle {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-weight: 400;
+  margin-top: 4px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.last-updated {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  font-weight: 400;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.last-updated .dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #22c55e;
+  display: inline-block;
+  box-shadow: 0 0 8px rgba(34, 197, 94, 0.5);
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+/* ── Loading / Error States ── */
+.state-overlay {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  text-align: center;
+  gap: 20px;
+}
+
+.spinner {
+  width: 48px;
+  height: 48px;
+  border: 3px solid var(--border-subtle);
+  border-top-color: var(--tiktok);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.state-overlay .message {
+  font-size: 1rem;
+  color: var(--text-secondary);
+}
+
+.state-overlay .error-message {
+  color: var(--xiaohongshu);
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.state-overlay code {
+  background: rgba(255, 255, 255, 0.06);
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-size: 0.85rem;
+  color: var(--tiktok);
+  border: 1px solid var(--border-subtle);
+}
+
+/* ── Summary Cards ── */
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 40px;
+}
+
+.card {
+  background: var(--bg-card);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius);
+  padding: 24px;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  border-radius: var(--radius) var(--radius) 0 0;
+}
+
+.card:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--border-light);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
+}
+
+.card.reddit::before { background: linear-gradient(90deg, var(--reddit), transparent); }
+.card.twitter::before { background: linear-gradient(90deg, var(--twitter), transparent); }
+.card.tiktok::before { background: linear-gradient(90deg, var(--tiktok), transparent); }
+.card.xiaohongshu::before { background: linear-gradient(90deg, var(--xiaohongshu), transparent); }
+
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.card-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.card.reddit .card-icon { background: var(--reddit-bg); color: var(--reddit); }
+.card.twitter .card-icon { background: var(--twitter-bg); color: var(--twitter); }
+.card.tiktok .card-icon { background: var(--tiktok-bg); color: var(--tiktok); }
+.card.xiaohongshu .card-icon { background: var(--xiaohongshu-bg); color: var(--xiaohongshu); }
+
+.card-platform {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.card-account {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  margin-top: 1px;
+}
+
+.card-account a {
+  color: var(--text-muted);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.card-account a:hover {
+  color: var(--text-secondary);
+}
+
+.card-metrics {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.metric {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.metric-value {
+  font-size: 1.4rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.metric-label {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 500;
+}
+
+.card-nodata {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  font-style: italic;
+  padding: 20px 0;
+  text-align: center;
+}
+
+/* ── Chart Section ── */
+.section {
+  margin-bottom: 40px;
+}
+
+.section-title {
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
+}
+
+.chart-container {
+  background: var(--bg-card);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius);
+  padding: 28px;
+  position: relative;
+  height: 340px;
+}
+
+/* ── Tabs ── */
+.tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 16px;
+  background: var(--bg-card);
+  border-radius: var(--radius-sm);
+  padding: 4px;
+  border: 1px solid var(--border-subtle);
+  width: fit-content;
+  flex-wrap: wrap;
+}
+
+.tab {
+  padding: 8px 18px;
+  border-radius: 8px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  background: none;
+  font-family: inherit;
+  white-space: nowrap;
+}
+
+.tab:hover {
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.tab.active {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+/* ── Table ── */
+.table-wrapper {
+  background: var(--bg-card);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.table-scroll {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+}
+
+thead {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+thead th {
+  background: rgba(255, 255, 255, 0.03);
+  padding: 14px 16px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border-subtle);
+  cursor: pointer;
+  user-select: none;
+  transition: color 0.2s;
+  white-space: nowrap;
+}
+
+thead th:hover {
+  color: var(--text-secondary);
+}
+
+thead th.sorted-asc::after {
+  content: ' \u25B2';
+  font-size: 0.6rem;
+}
+
+thead th.sorted-desc::after {
+  content: ' \u25BC';
+  font-size: 0.6rem;
+}
+
+tbody tr {
+  transition: background 0.15s;
+}
+
+tbody tr:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+tbody td {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  vertical-align: middle;
+}
+
+tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.platform-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 6px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.platform-badge.reddit { background: var(--reddit-bg); color: var(--reddit); }
+.platform-badge.twitter { background: var(--twitter-bg); color: var(--twitter); }
+.platform-badge.tiktok { background: var(--tiktok-bg); color: var(--tiktok); }
+.platform-badge.xiaohongshu { background: var(--xiaohongshu-bg); color: var(--xiaohongshu); }
+
+.post-title {
+  max-width: 340px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+}
+
+.post-title a {
+  color: var(--text-primary);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.post-title a:hover {
+  color: var(--tiktok);
+}
+
+.link-icon {
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 0.8rem;
+  transition: color 0.2s;
+}
+
+.link-icon:hover {
+  color: var(--text-primary);
+}
+
+.empty-table {
+  padding: 40px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+/* ── Footer ── */
+.footer {
+  padding: 32px 0;
+  text-align: center;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  border-top: 1px solid var(--border-subtle);
+  margin-top: 24px;
+}
+
+/* ── Responsive ── */
+@media (max-width: 1024px) {
+  .cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .container { padding: 0 16px; }
+  .header { padding: 24px 0 20px; flex-direction: column; align-items: flex-start; }
+  .header-left h1 { font-size: 1.35rem; }
+  .cards-grid { grid-template-columns: 1fr; gap: 12px; }
+  .card { padding: 20px; }
+  .metric-value { font-size: 1.15rem; }
+  .chart-container { height: 280px; padding: 16px; }
+  .tabs { width: 100%; overflow-x: auto; }
+  table { font-size: 0.75rem; }
+  thead th, tbody td { padding: 10px 12px; }
+  .post-title { max-width: 180px; }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <header class="header" id="header">
+    <div class="header-left">
+      <h1>Tripilot Social Dashboard</h1>
+      <div class="subtitle">Cross-platform analytics</div>
+    </div>
+    <div class="last-updated" id="lastUpdated"></div>
+  </header>
+
+  <main id="main">
+    <div class="state-overlay" id="loadingState">
+      <div class="spinner"></div>
+      <div class="message">Loading dashboard data...</div>
+    </div>
+  </main>
+
+  <footer class="footer">Tripilot Social Dashboard</footer>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  // ── Platform config ──
+  const PLATFORMS = {
+    reddit:      { label: 'Reddit',      icon: 'R', color: '#FF4500', colorBg: 'rgba(255,69,0,0.12)',   primaryMetric: 'total_score',    primaryLabel: 'Total Score',    perPostLabel: 'Avg Score' },
+    twitter:     { label: 'Twitter / X', icon: 'X', color: '#ffffff', colorBg: 'rgba(255,255,255,0.08)', primaryMetric: 'total_likes',    primaryLabel: 'Total Likes',    perPostLabel: 'Avg Likes' },
+    tiktok:      { label: 'TikTok',      icon: 'T', color: '#00F2EA', colorBg: 'rgba(0,242,234,0.10)',  primaryMetric: 'total_views',    primaryLabel: 'Total Views',    perPostLabel: 'Avg Views' },
+    xiaohongshu: { label: 'Xiaohongshu', icon: 'X', color: '#FF2442', colorBg: 'rgba(255,36,66,0.12)',  primaryMetric: 'total_likes',    primaryLabel: 'Total Likes',    perPostLabel: 'Avg Likes' },
+  };
+
+  const PLATFORM_KEYS = ['reddit', 'twitter', 'tiktok', 'xiaohongshu'];
+
+  // ── Helpers ──
+  function fmt(n) {
+    if (n == null) return '-';
+    if (n >= 1_000_000) return (n / 1_000_000).toFixed(1) + 'M';
+    if (n >= 1_000) return (n / 1_000).toFixed(1) + 'K';
+    return n.toLocaleString();
+  }
+
+  function fmtDate(iso) {
+    if (!iso) return '-';
+    const d = new Date(iso);
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  }
+
+  function fmtTimestamp(iso) {
+    if (!iso) return '';
+    const d = new Date(iso);
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+  }
+
+  function primaryValue(stats, key) {
+    const cfg = PLATFORMS[key];
+    return stats ? (stats[cfg.primaryMetric] || 0) : 0;
+  }
+
+  function avgPerPost(stats, key) {
+    const pv = primaryValue(stats, key);
+    const pc = stats ? (stats.post_count || 0) : 0;
+    return pc > 0 ? Math.round(pv / pc) : 0;
+  }
+
+  // ── Rendering ──
+  function showError(msg) {
+    document.getElementById('main').innerHTML = `
+      <div class="state-overlay">
+        <div class="error-message">${msg}</div>
+        <div class="message">Serve this directory with a local server:</div>
+        <code>python3 -m http.server 8080</code>
+        <div class="message" style="margin-top:4px;font-size:0.78rem;">Then open <strong>http://localhost:8080/dashboard.html</strong></div>
+      </div>`;
+  }
+
+  function render(data) {
+    const platforms = data.platforms || {};
+
+    // Update header timestamp
+    const ts = data.collected_at;
+    document.getElementById('lastUpdated').innerHTML = ts
+      ? `<span class="dot"></span> Last updated: ${fmtTimestamp(ts)}`
+      : '';
+
+    let html = '';
+
+    // ── Cards ──
+    html += '<section class="section"><div class="cards-grid">';
+    for (const key of PLATFORM_KEYS) {
+      const cfg = PLATFORMS[key];
+      const pd = platforms[key];
+      const stats = pd ? pd.stats : null;
+      const hasData = pd && stats;
+
+      html += `<div class="card ${key}">`;
+      html += `<div class="card-header">`;
+      html += `<div class="card-icon">${cfg.icon}</div>`;
+      html += `<div><div class="card-platform">${cfg.label}</div>`;
+      if (pd && pd.account) {
+        const profileUrl = pd.profile_url || '#';
+        html += `<div class="card-account"><a href="${profileUrl}" target="_blank" rel="noopener">@${pd.account}</a></div>`;
+      }
+      html += `</div></div>`;
+
+      if (hasData) {
+        html += `<div class="card-metrics">`;
+        html += `<div class="metric"><div class="metric-value">${fmt(stats.post_count || 0)}</div><div class="metric-label">Posts</div></div>`;
+        html += `<div class="metric"><div class="metric-value">${fmt(primaryValue(stats, key))}</div><div class="metric-label">${cfg.primaryLabel}</div></div>`;
+        html += `<div class="metric"><div class="metric-value">${fmt(avgPerPost(stats, key))}</div><div class="metric-label">${cfg.perPostLabel}</div></div>`;
+
+        // Fourth metric: secondary stat
+        let secVal = '-', secLabel = '';
+        if (key === 'reddit')      { secVal = fmt(stats.total_comments || 0); secLabel = 'Comments'; }
+        if (key === 'twitter')     { secVal = fmt(stats.total_views || 0);    secLabel = 'Views'; }
+        if (key === 'tiktok')      { secVal = fmt(stats.total_likes || 0);    secLabel = 'Likes'; }
+        if (key === 'xiaohongshu') { secVal = fmt(stats.total_collects || 0); secLabel = 'Collects'; }
+        html += `<div class="metric"><div class="metric-value">${secVal}</div><div class="metric-label">${secLabel}</div></div>`;
+        html += `</div>`;
+      } else {
+        html += `<div class="card-nodata">No data yet</div>`;
+      }
+      html += `</div>`;
+    }
+    html += '</div></section>';
+
+    // ── Chart ──
+    html += `<section class="section">
+      <div class="section-title">Engagement Overview</div>
+      <div class="chart-container"><canvas id="engagementChart"></canvas></div>
+    </section>`;
+
+    // ── Tabs + Table ──
+    html += `<section class="section">
+      <div class="section-title">Posts</div>
+      <div class="tabs" id="platformTabs">
+        <button class="tab active" data-platform="all">All</button>
+        <button class="tab" data-platform="reddit">Reddit</button>
+        <button class="tab" data-platform="twitter">Twitter / X</button>
+        <button class="tab" data-platform="tiktok">TikTok</button>
+        <button class="tab" data-platform="xiaohongshu">Xiaohongshu</button>
+      </div>
+      <div class="table-wrapper"><div class="table-scroll">
+        <table id="postsTable">
+          <thead>
+            <tr>
+              <th data-col="date" class="sorted-desc">Date</th>
+              <th data-col="platform">Platform</th>
+              <th data-col="title">Title</th>
+              <th data-col="engagement">Likes / Score</th>
+              <th data-col="comments">Comments</th>
+              <th data-col="views">Views</th>
+              <th data-col="link">Link</th>
+            </tr>
+          </thead>
+          <tbody id="postsBody"></tbody>
+        </table>
+      </div></div>
+    </section>`;
+
+    document.getElementById('main').innerHTML = html;
+
+    // ── Build posts array ──
+    const allPosts = [];
+    for (const key of PLATFORM_KEYS) {
+      const pd = platforms[key];
+      if (!pd || !pd.posts) continue;
+      for (const p of pd.posts) {
+        allPosts.push({
+          platform: key,
+          date: p.date || '',
+          title: p.title || '',
+          url: p.url || '',
+          engagement: p.score ?? p.likes ?? 0,
+          comments: p.comments ?? 0,
+          views: p.views ?? null,
+          raw: p,
+        });
+      }
+    }
+
+    // ── Table state ──
+    let currentFilter = 'all';
+    let sortCol = 'date';
+    let sortDir = -1; // -1 = desc
+
+    function renderTable() {
+      const filtered = currentFilter === 'all'
+        ? allPosts
+        : allPosts.filter(p => p.platform === currentFilter);
+
+      const sorted = [...filtered].sort((a, b) => {
+        let va, vb;
+        switch (sortCol) {
+          case 'date':       va = a.date; vb = b.date; break;
+          case 'platform':   va = a.platform; vb = b.platform; break;
+          case 'title':      va = a.title.toLowerCase(); vb = b.title.toLowerCase(); break;
+          case 'engagement': va = a.engagement; vb = b.engagement; break;
+          case 'comments':   va = a.comments; vb = b.comments; break;
+          case 'views':      va = a.views ?? -1; vb = b.views ?? -1; break;
+          default:           va = a.date; vb = b.date;
+        }
+        if (va < vb) return -1 * sortDir;
+        if (va > vb) return 1 * sortDir;
+        return 0;
+      });
+
+      const tbody = document.getElementById('postsBody');
+      if (sorted.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" class="empty-table">No posts to display</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = sorted.map(p => {
+        const cfg = PLATFORMS[p.platform];
+        const titleContent = p.url
+          ? `<a href="${p.url}" target="_blank" rel="noopener">${escHtml(p.title)}</a>`
+          : escHtml(p.title);
+        return `<tr>
+          <td style="white-space:nowrap">${fmtDate(p.date)}</td>
+          <td><span class="platform-badge ${p.platform}">${cfg.label}</span></td>
+          <td><span class="post-title">${titleContent}</span></td>
+          <td>${fmt(p.engagement)}</td>
+          <td>${fmt(p.comments)}</td>
+          <td>${p.views != null ? fmt(p.views) : '-'}</td>
+          <td>${p.url ? `<a class="link-icon" href="${p.url}" target="_blank" rel="noopener">\u2197</a>` : '-'}</td>
+        </tr>`;
+      }).join('');
+    }
+
+    function escHtml(s) {
+      const d = document.createElement('div');
+      d.textContent = s;
+      return d.innerHTML;
+    }
+
+    // ── Table header sorting ──
+    document.querySelectorAll('#postsTable thead th[data-col]').forEach(th => {
+      if (th.dataset.col === 'link') return;
+      th.addEventListener('click', () => {
+        const col = th.dataset.col;
+        if (sortCol === col) {
+          sortDir *= -1;
+        } else {
+          sortCol = col;
+          sortDir = col === 'date' ? -1 : -1;
+        }
+        document.querySelectorAll('#postsTable thead th').forEach(h => {
+          h.classList.remove('sorted-asc', 'sorted-desc');
+        });
+        th.classList.add(sortDir === 1 ? 'sorted-asc' : 'sorted-desc');
+        renderTable();
+      });
+    });
+
+    // ── Tabs ──
+    document.getElementById('platformTabs').addEventListener('click', (e) => {
+      if (!e.target.classList.contains('tab')) return;
+      document.querySelectorAll('#platformTabs .tab').forEach(t => t.classList.remove('active'));
+      e.target.classList.add('active');
+      currentFilter = e.target.dataset.platform;
+      renderTable();
+    });
+
+    renderTable();
+
+    // ── Chart ──
+    buildChart(platforms);
+  }
+
+  // ── Chart ──
+  function buildChart(platforms) {
+    const ctx = document.getElementById('engagementChart');
+    if (!ctx) return;
+
+    const present = PLATFORM_KEYS.filter(k => platforms[k] && platforms[k].stats);
+    if (present.length === 0) return;
+
+    // Metric groups: Posts, Primary Engagement, Comments/Secondary
+    const labels = present.map(k => PLATFORMS[k].label);
+
+    const postCounts = present.map(k => platforms[k].stats.post_count || 0);
+    const primaryEngagement = present.map(k => primaryValue(platforms[k].stats, k));
+
+    const bgColors = present.map(k => PLATFORMS[k].color);
+    const bgColorsFaded = present.map(k => {
+      const c = PLATFORMS[k].color;
+      // Make faded version
+      return c + '99';
+    });
+
+    new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels,
+        datasets: [
+          {
+            label: 'Posts',
+            data: postCounts,
+            backgroundColor: present.map(k => PLATFORMS[k].colorBg),
+            borderColor: bgColors,
+            borderWidth: 1.5,
+            borderRadius: 6,
+            barPercentage: 0.6,
+            categoryPercentage: 0.7,
+          },
+          {
+            label: 'Primary Engagement',
+            data: primaryEngagement,
+            backgroundColor: bgColorsFaded,
+            borderColor: bgColors,
+            borderWidth: 1.5,
+            borderRadius: 6,
+            barPercentage: 0.6,
+            categoryPercentage: 0.7,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: {
+          intersect: false,
+          mode: 'index',
+        },
+        plugins: {
+          legend: {
+            position: 'top',
+            align: 'end',
+            labels: {
+              color: '#8a8a9a',
+              font: { family: 'Inter', size: 11, weight: '500' },
+              usePointStyle: true,
+              pointStyle: 'rectRounded',
+              padding: 16,
+            },
+          },
+          tooltip: {
+            backgroundColor: '#1a1a2a',
+            titleColor: '#f0f0f5',
+            bodyColor: '#8a8a9a',
+            borderColor: 'rgba(255,255,255,0.1)',
+            borderWidth: 1,
+            cornerRadius: 10,
+            padding: 12,
+            titleFont: { family: 'Inter', weight: '600' },
+            bodyFont: { family: 'Inter' },
+            callbacks: {
+              label: function (context) {
+                return context.dataset.label + ': ' + fmt(context.parsed.y);
+              },
+            },
+          },
+        },
+        scales: {
+          x: {
+            grid: { display: false },
+            ticks: {
+              color: '#55556a',
+              font: { family: 'Inter', size: 11, weight: '500' },
+            },
+            border: { display: false },
+          },
+          y: {
+            grid: {
+              color: 'rgba(255,255,255,0.04)',
+              drawBorder: false,
+            },
+            ticks: {
+              color: '#55556a',
+              font: { family: 'Inter', size: 11 },
+              callback: function (v) { return fmt(v); },
+            },
+            border: { display: false },
+            beginAtZero: true,
+          },
+        },
+      },
+    });
+  }
+
+  // ── Fetch data ──
+  fetch('data/social_data.json')
+    .then(res => {
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return res.json();
+    })
+    .then(data => render(data))
+    .catch(err => {
+      console.error('Failed to load data:', err);
+      showError('Could not load social_data.json');
+    });
+
+})();
+</script>
+</body>
+</html>
