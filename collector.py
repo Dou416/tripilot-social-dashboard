@@ -14,7 +14,6 @@ from pathlib import Path
 import requests
 import yaml
 from dotenv import load_dotenv
-import instaloader
 
 # ---------------------------------------------------------------------------
 # Setup
@@ -514,13 +513,19 @@ def fetch_instagram_trends(keywords: list[str]) -> dict | None:
     
     all_posts = []
     try:
+        import instaloader
+
         L = instaloader.Instaloader()
         L.login(insta_user, insta_pass)
         log.info("Instagram Trends: logged in")
 
         for keyword in keywords:
-            log.info(f"Instagram Trends: searching for '#{keyword}'")
-            hashtag = instaloader.Hashtag.from_name(L.context, keyword)
+            # Instagram hashtag search does not support spaces.
+            hashtag_name = keyword.strip().replace(" ", "")
+            if not hashtag_name:
+                continue
+            log.info(f"Instagram Trends: searching for '#{hashtag_name}'")
+            hashtag = instaloader.Hashtag.from_name(L.context, hashtag_name)
             for post in hashtag.get_posts():
                 if len(all_posts) >= 20 * len(keywords):
                     break
@@ -566,21 +571,21 @@ def main():
     trends = {}
 
     # Fetch user-specific data
-    # reddit_data = fetch_reddit(config)
-    # if reddit_data:
-    #     platforms["reddit"] = reddit_data
+    reddit_data = fetch_reddit(config)
+    if reddit_data:
+        platforms["reddit"] = reddit_data
 
-    # twitter_data = fetch_twitter(config)
-    # if twitter_data:
-    #     platforms["twitter"] = twitter_data
+    twitter_data = fetch_twitter(config)
+    if twitter_data:
+        platforms["twitter"] = twitter_data
 
-    # tiktok_data = fetch_tiktok(config)
-    # if tiktok_data:
-    #     platforms["tiktok"] = tiktok_data
+    tiktok_data = fetch_tiktok(config)
+    if tiktok_data:
+        platforms["tiktok"] = tiktok_data
 
-    # xhs_data = fetch_xiaohongshu(config)
-    # if xhs_data:
-    #     platforms["xiaohongshu"] = xhs_data
+    xhs_data = fetch_xiaohongshu(config)
+    if xhs_data:
+        platforms["xiaohongshu"] = xhs_data
     
     # Fetch trending topics
     keywords = config.get("trends", {}).get("keywords", [])

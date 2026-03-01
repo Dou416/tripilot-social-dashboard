@@ -29,10 +29,12 @@
   --twitter: #ffffff;
   --tiktok: #00F2EA;
   --xiaohongshu: #FF2442;
+  --instagram: #E1306C;
   --reddit-bg: rgba(255, 69, 0, 0.12);
   --twitter-bg: rgba(255, 255, 255, 0.08);
   --tiktok-bg: rgba(0, 242, 234, 0.10);
   --xiaohongshu-bg: rgba(255, 36, 66, 0.12);
+  --instagram-bg: rgba(225, 48, 108, 0.12);
   --radius: 16px;
   --radius-sm: 10px;
   --shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
@@ -459,6 +461,36 @@ tbody tr:last-child td {
 .platform-badge.twitter { background: var(--twitter-bg); color: var(--twitter); }
 .platform-badge.tiktok { background: var(--tiktok-bg); color: var(--tiktok); }
 .platform-badge.xiaohongshu { background: var(--xiaohongshu-bg); color: var(--xiaohongshu); }
+.platform-badge.instagram { background: var(--instagram-bg); color: var(--instagram); }
+
+/* ── Trend Keywords ── */
+.keyword-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.keyword-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+}
+
+.keyword-title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.keyword-meta {
+  margin-top: 4px;
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
 
 .post-title {
   max-width: 340px;
@@ -562,6 +594,13 @@ tbody tr:last-child td {
   };
 
   const PLATFORM_KEYS = ['reddit', 'twitter', 'tiktok', 'xiaohongshu'];
+  const TREND_PLATFORM_META = {
+    reddit: { label: 'Reddit' },
+    twitter: { label: 'Twitter / X' },
+    tiktok: { label: 'TikTok' },
+    instagram: { label: 'Instagram' },
+  };
+  const TREND_PLATFORM_KEYS = ['reddit', 'twitter', 'tiktok', 'instagram'];
 
   // ── Helpers ──
   function fmt(n) {
@@ -607,6 +646,7 @@ tbody tr:last-child td {
 
   function render(data) {
     const platforms = data.platforms || {};
+    const trends = data.trends || {};
 
     // Update header timestamp
     const ts = data.collected_at;
@@ -640,11 +680,10 @@ tbody tr:last-child td {
         html += `<div class="metric"><div class="metric-value">${fmt(primaryValue(stats, key))}</div><div class="metric-label">${cfg.primaryLabel}</div></div>`;
         html += `<div class="metric"><div class="metric-value">${fmt(avgPerPost(stats, key))}</div><div class="metric-label">${cfg.perPostLabel}</div></div>`;
 
-        // Fourth metric: secondary stat
         let secVal = '-', secLabel = '';
         if (key === 'reddit')      { secVal = fmt(stats.total_comments || 0); secLabel = 'Comments'; }
-        if (key === 'twitter')     { secVal = fmt(stats.total_views || 0);    secLabel = 'Views'; }
-        if (key === 'tiktok')      { secVal = fmt(stats.total_likes || 0);    secLabel = 'Likes'; }
+        if (key === 'twitter')     { secVal = fmt(stats.total_views || 0); secLabel = 'Views'; }
+        if (key === 'tiktok')      { secVal = fmt(stats.total_likes || 0); secLabel = 'Likes'; }
         if (key === 'xiaohongshu') { secVal = fmt(stats.total_collects || 0); secLabel = 'Collects'; }
         html += `<div class="metric"><div class="metric-value">${secVal}</div><div class="metric-label">${secLabel}</div></div>`;
         html += `</div>`;
@@ -661,9 +700,9 @@ tbody tr:last-child td {
       <div class="chart-container"><canvas id="engagementChart"></canvas></div>
     </section>`;
 
-    // ── Tabs + Table ──
+    // ── Performance table ──
     html += `<section class="section">
-      <div class="section-title">Posts</div>
+      <div class="section-title">Social Media Performance</div>
       <div class="tabs" id="platformTabs">
         <button class="tab active" data-platform="all">All</button>
         <button class="tab" data-platform="reddit">Reddit</button>
@@ -689,9 +728,54 @@ tbody tr:last-child td {
       </div></div>
     </section>`;
 
+    // ── Trend section ──
+    html += `<section class="section">
+      <div class="section-title">Trending Words</div>
+      <div class="keyword-grid" id="keywordGrid"></div>
+      <div class="tabs" id="trendPlatformTabs">
+        <button class="tab active" data-platform="all">All</button>
+        <button class="tab" data-platform="reddit">Reddit</button>
+        <button class="tab" data-platform="twitter">Twitter / X</button>
+        <button class="tab" data-platform="tiktok">TikTok</button>
+        <button class="tab" data-platform="instagram">Instagram</button>
+      </div>
+      <div class="table-wrapper"><div class="table-scroll">
+        <table id="trendTable">
+          <thead>
+            <tr>
+              <th data-col="date" class="sorted-desc">Date</th>
+              <th data-col="platform">Platform</th>
+              <th data-col="keyword">Keyword</th>
+              <th data-col="title">Title</th>
+              <th data-col="engagement">Engagement</th>
+              <th data-col="comments">Comments</th>
+              <th data-col="link">Link</th>
+            </tr>
+          </thead>
+          <tbody id="trendsBody"></tbody>
+        </table>
+      </div></div>
+    </section>`;
+
     document.getElementById('main').innerHTML = html;
 
-    // ── Build posts array ──
+    function escHtml(s) {
+      const d = document.createElement('div');
+      d.textContent = s;
+      return d.innerHTML;
+    }
+
+    function trendEngagement(row, platformKey) {
+      if (platformKey === 'reddit') return row.score ?? 0;
+      if (platformKey === 'tiktok') return row.views ?? row.likes ?? 0;
+      return row.likes ?? row.score ?? row.views ?? 0;
+    }
+
+    function trendPlatformLabel(platformKey) {
+      return TREND_PLATFORM_META[platformKey]?.label || platformKey;
+    }
+
+    // ── Build performance posts ──
     const allPosts = [];
     for (const key of PLATFORM_KEYS) {
       const pd = platforms[key];
@@ -705,17 +789,15 @@ tbody tr:last-child td {
           engagement: p.score ?? p.likes ?? 0,
           comments: p.comments ?? 0,
           views: p.views ?? null,
-          raw: p,
         });
       }
     }
 
-    // ── Table state ──
     let currentFilter = 'all';
     let sortCol = 'date';
-    let sortDir = -1; // -1 = desc
+    let sortDir = -1;
 
-    function renderTable() {
+    function renderPostsTable() {
       const filtered = currentFilter === 'all'
         ? allPosts
         : allPosts.filter(p => p.platform === currentFilter);
@@ -723,13 +805,13 @@ tbody tr:last-child td {
       const sorted = [...filtered].sort((a, b) => {
         let va, vb;
         switch (sortCol) {
-          case 'date':       va = a.date; vb = b.date; break;
-          case 'platform':   va = a.platform; vb = b.platform; break;
-          case 'title':      va = a.title.toLowerCase(); vb = b.title.toLowerCase(); break;
+          case 'date': va = a.date; vb = b.date; break;
+          case 'platform': va = a.platform; vb = b.platform; break;
+          case 'title': va = a.title.toLowerCase(); vb = b.title.toLowerCase(); break;
           case 'engagement': va = a.engagement; vb = b.engagement; break;
-          case 'comments':   va = a.comments; vb = b.comments; break;
-          case 'views':      va = a.views ?? -1; vb = b.views ?? -1; break;
-          default:           va = a.date; vb = b.date;
+          case 'comments': va = a.comments; vb = b.comments; break;
+          case 'views': va = a.views ?? -1; vb = b.views ?? -1; break;
+          default: va = a.date; vb = b.date;
         }
         if (va < vb) return -1 * sortDir;
         if (va > vb) return 1 * sortDir;
@@ -759,13 +841,6 @@ tbody tr:last-child td {
       }).join('');
     }
 
-    function escHtml(s) {
-      const d = document.createElement('div');
-      d.textContent = s;
-      return d.innerHTML;
-    }
-
-    // ── Table header sorting ──
     document.querySelectorAll('#postsTable thead th[data-col]').forEach(th => {
       if (th.dataset.col === 'link') return;
       th.addEventListener('click', () => {
@@ -774,28 +849,148 @@ tbody tr:last-child td {
           sortDir *= -1;
         } else {
           sortCol = col;
-          sortDir = col === 'date' ? -1 : -1;
+          sortDir = -1;
         }
         document.querySelectorAll('#postsTable thead th').forEach(h => {
           h.classList.remove('sorted-asc', 'sorted-desc');
         });
         th.classList.add(sortDir === 1 ? 'sorted-asc' : 'sorted-desc');
-        renderTable();
+        renderPostsTable();
       });
     });
 
-    // ── Tabs ──
-    document.getElementById('platformTabs').addEventListener('click', (e) => {
+    const performanceTabs = document.getElementById('platformTabs');
+    performanceTabs.addEventListener('click', (e) => {
       if (!e.target.classList.contains('tab')) return;
       document.querySelectorAll('#platformTabs .tab').forEach(t => t.classList.remove('active'));
       e.target.classList.add('active');
       currentFilter = e.target.dataset.platform;
-      renderTable();
+      renderPostsTable();
+    });
+    renderPostsTable();
+
+    // ── Build trend rows ──
+    const allTrendRows = [];
+    for (const key of TREND_PLATFORM_KEYS) {
+      const td = trends[key];
+      if (!td || !Array.isArray(td.keyword_results)) continue;
+      for (const row of td.keyword_results) {
+        allTrendRows.push({
+          platform: key,
+          date: row.date || '',
+          keyword: row.keyword || '',
+          title: row.title || '',
+          url: row.url || '',
+          engagement: trendEngagement(row, key),
+          comments: row.comments ?? 0,
+        });
+      }
+    }
+
+    // ── Trend keyword cards ──
+    const keywordStats = {};
+    for (const row of allTrendRows) {
+      const key = row.keyword || 'Unknown';
+      if (!keywordStats[key]) {
+        keywordStats[key] = { mentions: 0, engagement: 0 };
+      }
+      keywordStats[key].mentions += 1;
+      keywordStats[key].engagement += row.engagement;
+    }
+
+    const sortedKeywords = Object.entries(keywordStats).sort((a, b) => b[1].engagement - a[1].engagement);
+    const keywordGrid = document.getElementById('keywordGrid');
+    if (sortedKeywords.length === 0) {
+      keywordGrid.innerHTML = `
+        <div class="keyword-card">
+          <div class="keyword-title">No trend keywords yet</div>
+          <div class="keyword-meta">Run collector.py to fetch trend data</div>
+        </div>`;
+    } else {
+      keywordGrid.innerHTML = sortedKeywords.map(([keyword, stats]) => `
+        <div class="keyword-card">
+          <div class="keyword-title">${escHtml(keyword)}</div>
+          <div class="keyword-meta">${fmt(stats.mentions)} mentions | ${fmt(stats.engagement)} engagement</div>
+        </div>
+      `).join('');
+    }
+
+    // ── Trend table ──
+    let trendFilter = 'all';
+    let trendSortCol = 'date';
+    let trendSortDir = -1;
+
+    function renderTrendTable() {
+      const filtered = trendFilter === 'all'
+        ? allTrendRows
+        : allTrendRows.filter(p => p.platform === trendFilter);
+
+      const sorted = [...filtered].sort((a, b) => {
+        let va, vb;
+        switch (trendSortCol) {
+          case 'date': va = a.date; vb = b.date; break;
+          case 'platform': va = a.platform; vb = b.platform; break;
+          case 'keyword': va = a.keyword.toLowerCase(); vb = b.keyword.toLowerCase(); break;
+          case 'title': va = a.title.toLowerCase(); vb = b.title.toLowerCase(); break;
+          case 'engagement': va = a.engagement; vb = b.engagement; break;
+          case 'comments': va = a.comments; vb = b.comments; break;
+          default: va = a.date; vb = b.date;
+        }
+        if (va < vb) return -1 * trendSortDir;
+        if (va > vb) return 1 * trendSortDir;
+        return 0;
+      });
+
+      const tbody = document.getElementById('trendsBody');
+      if (sorted.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" class="empty-table">No trend posts to display</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = sorted.map(row => {
+        const titleContent = row.url
+          ? `<a href="${row.url}" target="_blank" rel="noopener">${escHtml(row.title)}</a>`
+          : escHtml(row.title);
+        return `<tr>
+          <td style="white-space:nowrap">${fmtDate(row.date)}</td>
+          <td><span class="platform-badge ${row.platform}">${trendPlatformLabel(row.platform)}</span></td>
+          <td>${escHtml(row.keyword)}</td>
+          <td><span class="post-title">${titleContent}</span></td>
+          <td>${fmt(row.engagement)}</td>
+          <td>${fmt(row.comments)}</td>
+          <td>${row.url ? `<a class="link-icon" href="${row.url}" target="_blank" rel="noopener">\u2197</a>` : '-'}</td>
+        </tr>`;
+      }).join('');
+    }
+
+    document.querySelectorAll('#trendTable thead th[data-col]').forEach(th => {
+      if (th.dataset.col === 'link') return;
+      th.addEventListener('click', () => {
+        const col = th.dataset.col;
+        if (trendSortCol === col) {
+          trendSortDir *= -1;
+        } else {
+          trendSortCol = col;
+          trendSortDir = -1;
+        }
+        document.querySelectorAll('#trendTable thead th').forEach(h => {
+          h.classList.remove('sorted-asc', 'sorted-desc');
+        });
+        th.classList.add(trendSortDir === 1 ? 'sorted-asc' : 'sorted-desc');
+        renderTrendTable();
+      });
     });
 
-    renderTable();
+    const trendTabs = document.getElementById('trendPlatformTabs');
+    trendTabs.addEventListener('click', (e) => {
+      if (!e.target.classList.contains('tab')) return;
+      document.querySelectorAll('#trendPlatformTabs .tab').forEach(t => t.classList.remove('active'));
+      e.target.classList.add('active');
+      trendFilter = e.target.dataset.platform;
+      renderTrendTable();
+    });
+    renderTrendTable();
 
-    // ── Chart ──
     buildChart(platforms);
   }
 
