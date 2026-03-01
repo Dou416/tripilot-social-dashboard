@@ -38,9 +38,19 @@ jobs:
           EOF
 
       - name: Run collector
-        run: python collector.py
+        id: collector
+        run: |
+          set +e
+          python collector.py
+          code=$?
+          echo "exit_code=$code" >> "$GITHUB_OUTPUT"
+          if [ "$code" -ne 0 ]; then
+            echo "Collector exited with code $code. Skipping commit."
+          fi
+          exit 0
 
       - name: Commit updated data
+        if: steps.collector.outputs.exit_code == '0'
         run: |
           if git diff --quiet -- data/social_data.json; then
             echo "No data changes to commit."
