@@ -223,13 +223,23 @@ def fetch_tiktok(config: dict) -> dict | None:
         import asyncio
         from TikTokApi import TikTokApi
 
+        async def create_tiktok_session(api, token: str) -> bool:
+            session_attempts = [
+                {"ms_tokens": [token], "num_sessions": 1, "sleep_after": 3},
+                {"ms_tokens": [token], "num_sessions": 1, "sleep_after": 3, "browser": "webkit"},
+            ]
+            for attempt in session_attempts:
+                try:
+                    await api.create_sessions(**attempt)
+                    return True
+                except Exception as e:
+                    log.warning(f"TikTok: session init failed with {attempt} — {e}")
+            return False
+
         async def _fetch():
             async with TikTokApi() as api:
-                await api.create_sessions(
-                    ms_tokens=[ms_token],
-                    num_sessions=1,
-                    sleep_after=3,
-                )
+                if not await create_tiktok_session(api, ms_token):
+                    raise RuntimeError("TikTok: could not initialize API session")
                 user = api.user(username)
                 videos = []
                 async for video in user.videos(count=30):
@@ -484,6 +494,19 @@ def fetch_tiktok_trends(keywords: list[str]) -> dict | None:
         import asyncio
         from TikTokApi import TikTokApi
 
+        async def create_tiktok_session(api, token: str) -> bool:
+            session_attempts = [
+                {"ms_tokens": [token], "num_sessions": 1, "sleep_after": 3},
+                {"ms_tokens": [token], "num_sessions": 1, "sleep_after": 3, "browser": "webkit"},
+            ]
+            for attempt in session_attempts:
+                try:
+                    await api.create_sessions(**attempt)
+                    return True
+                except Exception as e:
+                    log.warning(f"TikTok Trends: session init failed with {attempt} — {e}")
+            return False
+
         def video_to_trend_row(video, keyword: str) -> dict:
             raw = getattr(video, "as_dict", None)
             if callable(raw):
@@ -509,7 +532,8 @@ def fetch_tiktok_trends(keywords: list[str]) -> dict | None:
 
         async def _fetch():
             async with TikTokApi() as api:
-                await api.create_sessions(ms_tokens=[ms_token], num_sessions=1, sleep_after=3)
+                if not await create_tiktok_session(api, ms_token):
+                    raise RuntimeError("TikTok Trends: could not initialize API session")
                 for keyword in keywords:
                     log.info(f"TikTok Trends: searching for '{keyword}'")
                     collected = 0
