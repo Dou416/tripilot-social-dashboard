@@ -14,6 +14,7 @@ from pathlib import Path
 import requests
 import yaml
 from dotenv import load_dotenv
+import instaloader
 
 # ---------------------------------------------------------------------------
 # Setup
@@ -340,6 +341,220 @@ def fetch_xiaohongshu(config: dict) -> dict | None:
 
 
 # ---------------------------------------------------------------------------
+# Trend Fetching
+# ---------------------------------------------------------------------------
+
+def fetch_reddit_trends(keywords: list[str]) -> dict | None:
+    """Fetches trending posts on Reddit for a list of keywords."""
+    log.info(f"Reddit Trends: fetching posts for keywords: {keywords}")
+    all_posts = []
+    for keyword in keywords:
+        log.info(f"Reddit Trends: searching for '{keyword}'")
+        url = "https://www.reddit.com/search.json"
+        headers = {"User-Agent": "TripilotDashboard/1.0"}
+        params = {"q": keyword, "sort": "top", "t": "week", "limit": 20}
+        try:
+            resp = requests.get(url, headers=headers, params=params, timeout=15)
+            resp.raise_for_status()
+            data = resp.json()
+            children = data.get("data", {}).get("children", [])
+            for child in children:
+                p = child.get("data", {})
+                all_posts.append({
+                    "keyword": keyword,
+                    "title": p.get("title", ""),
+                    "url": f"https://reddit.com{p.get('permalink', '')}",
+                    "subreddit": p.get("subreddit", ""),
+                    "score": p.get("score", 0),
+                    "comments": p.get("num_comments", 0),
+                    "upvote_ratio": p.get("upvote_ratio", 0),
+                    "date": datetime.fromtimestamp(
+                        p.get("created_utc", 0), tz=timezone.utc
+                    ).isoformat(),
+                })
+        except Exception as e:
+            log.error(f"Reddit Trends: request failed for '{keyword}' — {e}")
+            continue
+
+    if not all_posts:
+        return None
+
+    # Sort by score descending
+    all_posts.sort(key=lambda x: x["score"], reverse=True)
+
+    return {
+        "keyword_results": all_posts,
+        "stats": {"post_count": len(all_posts)},
+    }
+
+def fetch_twitter_trends(keywords: list[str]) -> dict | None:
+    """Fetches trending tweets on Twitter for a list of keywords."""
+    log.info(f"Twitter Trends: fetching tweets for keywords: {keywords}")
+    tw_user = os.getenv("TWITTER_USERNAME")
+    tw_pass = os.getenv("TWITTER_PASSWORD")
+
+    if not tw_user or not tw_pass:
+        log.warning("Twitter Trends: TWITTER_USERNAME / TWITTER_PASSWORD not set in .env, skipping")
+        return None
+
+    all_tweets = []
+    try:
+        import asyncio
+        from twikit import Client
+
+        async def _fetch():
+            client = Client("en-US")
+            cookies_path = BASE_DIR / ".twitter_cookies.json"
+            if cookies_path.exists():
+                client.load_cookies(str(cookies_path))
+                log.info("Twitter Trends: loaded saved cookies")
+            else:
+                await client.login(
+                    auth_info_1=tw_user,
+                    auth_info_2=tw_user,
+                    password=tw_pass,
+                )
+                client.save_cookies(str(cookies_path))
+                log.info("Twitter Trends: logged in and saved cookies")
+
+            for keyword in keywords:
+                log.info(f"Twitter Trends: searching for '{keyword}'")
+                search_results = await client.search_tweet(keyword, 'Top')
+                for t in search_results[:20]: # Limit to 20
+                    all_tweets.append({
+                        "keyword": keyword,
+                        "title": (t.text or "")[:120],
+                        "url": f"https://x.com/{t.user.screen_name}/status/{t.id}",
+                        "likes": t.favorite_count or 0,
+                        "retweets": t.retweet_count or 0,
+                        "views": getattr(t, "view_count", None) or 0,
+                        "comments": t.reply_count or 0,
+                        "date": t.created_at if isinstance(t.created_at, str)
+                            else t.created_at.isoformat() if t.created_at else "",
+                    })
+
+        asyncio.run(_fetch())
+
+        if not all_tweets:
+            return None
+
+        # Sort by likes descending
+        all_tweets.sort(key=lambda x: x["likes"], reverse=True)
+
+        return {
+            "keyword_results": all_tweets,
+            "stats": {"post_count": len(all_tweets)},
+        }
+
+    except Exception as e:
+        log.error(f"Twitter Trends: failed — {e}")
+        return None
+
+def fetch_tiktok_trends(keywords: list[str]) -> dict | None:
+    """Fetches trending videos on TikTok for a list of keywords."""
+    log.info(f"TikTok Trends: fetching videos for keywords: {keywords}")
+    ms_token = os.getenv("TIKTOK_MS_TOKEN", "")
+    if not ms_token:
+        log.warning("TikTok Trends: TIKTOK_MS_TOKEN not set in .env, skipping (required for API access)")
+        return None
+
+    all_videos = []
+    try:
+        import asyncio
+        from TikTokApi import TikTokApi
+
+        async def _fetch():
+            async with TikTokApi() as api:
+                await api.create_sessions(ms_tokens=[ms_token], num_sessions=1, sleep_after=3)
+                for keyword in keywords:
+                    log.info(f"TikTok Trends: searching for '{keyword}'")
+                    async for video in api.search.videos(keyword, count=20):
+                        info = video.as_dict
+                        stats = info.get("stats", {})
+                        author = info.get("author", {})
+                        all_videos.append({
+                            "keyword": keyword,
+                            "title": info.get("desc", "")[:120],
+                            "url": f"https://www.tiktok.com/@{author.get('uniqueId', '')}/video/{info.get('id', '')}",
+                            "views": stats.get("playCount", 0),
+                            "likes": stats.get("diggCount", 0),
+                            "comments": stats.get("commentCount", 0),
+                            "shares": stats.get("shareCount", 0),
+                            "date": datetime.fromtimestamp(
+                                info.get("createTime", 0), tz=timezone.utc
+                            ).isoformat(),
+                        })
+
+        asyncio.run(_fetch())
+
+        if not all_videos:
+            return None
+
+        # Sort by views descending
+        all_videos.sort(key=lambda x: x["views"], reverse=True)
+
+        return {
+            "keyword_results": all_videos,
+            "stats": {"post_count": len(all_videos)},
+        }
+
+    except Exception as e:
+        log.error(f"TikTok Trends: failed — {e}")
+        return None
+
+def fetch_instagram_trends(keywords: list[str]) -> dict | None:
+    """Fetches trending posts on Instagram for a list of keywords."""
+    log.info(f"Instagram Trends: fetching posts for keywords: {keywords}")
+    insta_user = os.getenv("INSTAGRAM_USERNAME")
+    insta_pass = os.getenv("INSTAGRAM_PASSWORD")
+
+    if not insta_user or not insta_pass:
+        log.warning("Instagram Trends: INSTAGRAM_USERNAME / INSTAGRAM_PASSWORD not set in .env, skipping")
+        return None
+    
+    all_posts = []
+    try:
+        L = instaloader.Instaloader()
+        L.login(insta_user, insta_pass)
+        log.info("Instagram Trends: logged in")
+
+        for keyword in keywords:
+            log.info(f"Instagram Trends: searching for '#{keyword}'")
+            hashtag = instaloader.Hashtag.from_name(L.context, keyword)
+            for post in hashtag.get_posts():
+                if len(all_posts) >= 20 * len(keywords):
+                    break
+                all_posts.append({
+                    "keyword": keyword,
+                    "title": post.caption[:120] if post.caption else "",
+                    "url": f"https://www.instagram.com/p/{post.shortcode}/",
+                    "likes": post.likes,
+                    "comments": post.comments,
+                    "date": post.date_utc.isoformat(),
+                })
+            if len(all_posts) >= 20 * len(keywords):
+                break
+        
+        if not all_posts:
+            return None
+
+        # Sort by likes descending
+        all_posts.sort(key=lambda x: x["likes"], reverse=True)
+        
+        # Limit to top 20 overall
+        top_20_posts = all_posts[:20]
+
+        return {
+            "keyword_results": top_20_posts,
+            "stats": {"post_count": len(top_20_posts)},
+        }
+
+    except Exception as e:
+        log.error(f"Instagram Trends: failed — {e}")
+        return None
+
+
+# ---------------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------------
 
@@ -348,27 +563,49 @@ def main():
     log.info("Starting social media data collection")
 
     platforms = {}
+    trends = {}
 
-    # Fetch all platforms — each one handles its own errors
-    reddit_data = fetch_reddit(config)
-    if reddit_data:
-        platforms["reddit"] = reddit_data
+    # Fetch user-specific data
+    # reddit_data = fetch_reddit(config)
+    # if reddit_data:
+    #     platforms["reddit"] = reddit_data
 
-    twitter_data = fetch_twitter(config)
-    if twitter_data:
-        platforms["twitter"] = twitter_data
+    # twitter_data = fetch_twitter(config)
+    # if twitter_data:
+    #     platforms["twitter"] = twitter_data
 
-    tiktok_data = fetch_tiktok(config)
-    if tiktok_data:
-        platforms["tiktok"] = tiktok_data
+    # tiktok_data = fetch_tiktok(config)
+    # if tiktok_data:
+    #     platforms["tiktok"] = tiktok_data
 
-    xhs_data = fetch_xiaohongshu(config)
-    if xhs_data:
-        platforms["xiaohongshu"] = xhs_data
+    # xhs_data = fetch_xiaohongshu(config)
+    # if xhs_data:
+    #     platforms["xiaohongshu"] = xhs_data
+    
+    # Fetch trending topics
+    keywords = config.get("trends", {}).get("keywords", [])
+    if keywords:
+        reddit_trends = fetch_reddit_trends(keywords)
+        if reddit_trends:
+            trends["reddit"] = reddit_trends
+
+        twitter_trends = fetch_twitter_trends(keywords)
+        if twitter_trends:
+            trends["twitter"] = twitter_trends
+
+        tiktok_trends = fetch_tiktok_trends(keywords)
+        if tiktok_trends:
+            trends["tiktok"] = tiktok_trends
+
+        instagram_trends = fetch_instagram_trends(keywords)
+        if instagram_trends:
+            trends["instagram"] = instagram_trends
+
 
     output = {
         "collected_at": datetime.now(timezone.utc).isoformat(),
         "platforms": platforms,
+        "trends": trends,
     }
 
     with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
@@ -376,9 +613,10 @@ def main():
 
     log.info(f"Data saved to {OUTPUT_FILE}")
     log.info(f"Platforms collected: {list(platforms.keys()) or 'none'}")
+    log.info(f"Trends collected for: {list(trends.keys()) or 'none'}")
 
-    if not platforms:
-        log.warning("No platform data collected. Check config.yaml and .env")
+    if not platforms and not trends:
+        log.warning("No data collected. Check config.yaml and .env")
         sys.exit(1)
 
 

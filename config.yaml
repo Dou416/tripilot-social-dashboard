@@ -12,3 +12,9 @@ tiktok:
 xiaohongshu:
   user_id: ""  # Get from profile URL: https://www.xiaohongshu.com/user/profile/XXXXXX
   # auth in .env: XHS_COOKIE
+
+trends:
+  keywords:
+    - "AI"
+    - "China Travel"
+    - "AI Travel"
