@@ -35,6 +35,7 @@ jobs:
           cat > .env << EOF
           TWITTER_USERNAME=${{ secrets.TWITTER_USERNAME }}
           TWITTER_PASSWORD=${{ secrets.TWITTER_PASSWORD }}
+          TWITTER_EMAIL=${{ secrets.TWITTER_EMAIL }}
           TIKTOK_MS_TOKEN=${{ secrets.TIKTOK_MS_TOKEN }}
           XHS_COOKIE=${{ secrets.XHS_COOKIE }}
           INSTAGRAM_USERNAME=${{ secrets.INSTAGRAM_USERNAME }}
@@ -43,6 +44,8 @@ jobs:
 
       - name: Run collector
         id: collector
+        env:
+          DISABLE_REDDIT: "true"
         run: |
           set +e
           python collector.py

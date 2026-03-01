@@ -39,6 +39,17 @@ def load_config() -> dict:
         return yaml.safe_load(f)
 
 
+def normalize_twitter_handle(value: str | None) -> str:
+    """Normalizes @handle/user input into a bare Twitter handle."""
+    if not value:
+        return ""
+    return value.strip().lstrip("@")
+
+
+def env_flag(name: str) -> bool:
+    return os.getenv(name, "").strip().lower() in {"1", "true", "yes", "on"}
+
+
 # ---------------------------------------------------------------------------
 # Reddit (public JSON API — no auth needed)
 # ---------------------------------------------------------------------------
@@ -107,9 +118,10 @@ def fetch_reddit(config: dict) -> dict | None:
 # ---------------------------------------------------------------------------
 
 def fetch_twitter(config: dict) -> dict | None:
-    username = config.get("twitter", {}).get("username")
-    tw_user = os.getenv("TWITTER_USERNAME")
+    username = normalize_twitter_handle(config.get("twitter", {}).get("username"))
+    tw_user = normalize_twitter_handle(os.getenv("TWITTER_USERNAME"))
     tw_pass = os.getenv("TWITTER_PASSWORD")
+    tw_email = os.getenv("TWITTER_EMAIL", "").strip()
 
     if not username:
         log.warning("Twitter: no username configured, skipping")
@@ -134,7 +146,7 @@ def fetch_twitter(config: dict) -> dict | None:
             else:
                 await client.login(
                     auth_info_1=tw_user,
-                    auth_info_2=tw_user,
+                    auth_info_2=tw_email or tw_user,
                     password=tw_pass,
                 )
                 client.save_cookies(str(cookies_path))
@@ -389,8 +401,9 @@ def fetch_reddit_trends(keywords: list[str]) -> dict | None:
 def fetch_twitter_trends(keywords: list[str]) -> dict | None:
     """Fetches trending tweets on Twitter for a list of keywords."""
     log.info(f"Twitter Trends: fetching tweets for keywords: {keywords}")
-    tw_user = os.getenv("TWITTER_USERNAME")
+    tw_user = normalize_twitter_handle(os.getenv("TWITTER_USERNAME"))
     tw_pass = os.getenv("TWITTER_PASSWORD")
+    tw_email = os.getenv("TWITTER_EMAIL", "").strip()
 
     if not tw_user or not tw_pass:
         log.warning("Twitter Trends: TWITTER_USERNAME / TWITTER_PASSWORD not set in .env, skipping")
@@ -410,7 +423,7 @@ def fetch_twitter_trends(keywords: list[str]) -> dict | None:
             else:
                 await client.login(
                     auth_info_1=tw_user,
-                    auth_info_2=tw_user,
+                    auth_info_2=tw_email or tw_user,
                     password=tw_pass,
                 )
                 client.save_cookies(str(cookies_path))
@@ -418,8 +431,16 @@ def fetch_twitter_trends(keywords: list[str]) -> dict | None:
 
             for keyword in keywords:
                 log.info(f"Twitter Trends: searching for '{keyword}'")
-                search_results = await client.search_tweet(keyword, 'Top')
-                for t in search_results[:20]: # Limit to 20
+                try:
+                    search_results = await client.search_tweet(keyword, "Top")
+                except Exception as e:
+                    log.error(f"Twitter Trends: search failed for '{keyword}' — {e}")
+                    continue
+
+                count = 0
+                for t in search_results:
+                    if count >= 20:
+                        break
                     all_tweets.append({
                         "keyword": keyword,
                         "title": (t.text or "")[:120],
@@ -431,6 +452,7 @@ def fetch_twitter_trends(keywords: list[str]) -> dict | None:
                         "date": t.created_at if isinstance(t.created_at, str)
                             else t.created_at.isoformat() if t.created_at else "",
                     })
+                    count += 1
 
         asyncio.run(_fetch())
 
@@ -462,27 +484,63 @@ def fetch_tiktok_trends(keywords: list[str]) -> dict | None:
         import asyncio
         from TikTokApi import TikTokApi
 
+        def video_to_trend_row(video, keyword: str) -> dict:
+            raw = getattr(video, "as_dict", None)
+            if callable(raw):
+                info = raw()
+            elif isinstance(raw, dict):
+                info = raw
+            else:
+                info = {}
+            stats = info.get("stats", {})
+            author = info.get("author", {})
+            return {
+                "keyword": keyword,
+                "title": info.get("desc", "")[:120],
+                "url": f"https://www.tiktok.com/@{author.get('uniqueId', '')}/video/{info.get('id', '')}",
+                "views": stats.get("playCount", 0),
+                "likes": stats.get("diggCount", 0),
+                "comments": stats.get("commentCount", 0),
+                "shares": stats.get("shareCount", 0),
+                "date": datetime.fromtimestamp(
+                    info.get("createTime", 0), tz=timezone.utc
+                ).isoformat() if info.get("createTime") else "",
+            }
+
         async def _fetch():
             async with TikTokApi() as api:
                 await api.create_sessions(ms_tokens=[ms_token], num_sessions=1, sleep_after=3)
                 for keyword in keywords:
                     log.info(f"TikTok Trends: searching for '{keyword}'")
-                    async for video in api.search.videos(keyword, count=20):
-                        info = video.as_dict
-                        stats = info.get("stats", {})
-                        author = info.get("author", {})
-                        all_videos.append({
-                            "keyword": keyword,
-                            "title": info.get("desc", "")[:120],
-                            "url": f"https://www.tiktok.com/@{author.get('uniqueId', '')}/video/{info.get('id', '')}",
-                            "views": stats.get("playCount", 0),
-                            "likes": stats.get("diggCount", 0),
-                            "comments": stats.get("commentCount", 0),
-                            "shares": stats.get("shareCount", 0),
-                            "date": datetime.fromtimestamp(
-                                info.get("createTime", 0), tz=timezone.utc
-                            ).isoformat(),
-                        })
+                    collected = 0
+
+                    # Strategy 1: keyword search endpoint (newer versions)
+                    search_obj = getattr(api, "search", None)
+                    if search_obj and hasattr(search_obj, "videos"):
+                        try:
+                            async for video in search_obj.videos(keyword, count=20):
+                                all_videos.append(video_to_trend_row(video, keyword))
+                                collected += 1
+                        except Exception as e:
+                            log.warning(f"TikTok Trends: keyword search failed for '{keyword}' — {e}")
+
+                    # Strategy 2: hashtag endpoint fallback (older/newer variants)
+                    if collected == 0 and hasattr(api, "hashtag"):
+                        hashtag_name = keyword.strip().replace(" ", "")
+                        if hashtag_name:
+                            try:
+                                try:
+                                    hashtag = api.hashtag(name=hashtag_name)
+                                except TypeError:
+                                    hashtag = api.hashtag(hashtag_name)
+                                async for video in hashtag.videos(count=20):
+                                    all_videos.append(video_to_trend_row(video, keyword))
+                                    collected += 1
+                            except Exception as e:
+                                log.error(f"TikTok Trends: hashtag search failed for '{keyword}' — {e}")
+
+                    if collected == 0:
+                        log.warning(f"TikTok Trends: no compatible search path returned results for '{keyword}'")
 
         asyncio.run(_fetch())
 
@@ -569,11 +627,15 @@ def main():
 
     platforms = {}
     trends = {}
+    reddit_enabled = not env_flag("DISABLE_REDDIT")
 
     # Fetch user-specific data
-    reddit_data = fetch_reddit(config)
-    if reddit_data:
-        platforms["reddit"] = reddit_data
+    if reddit_enabled:
+        reddit_data = fetch_reddit(config)
+        if reddit_data:
+            platforms["reddit"] = reddit_data
+    else:
+        log.info("Reddit collection disabled by DISABLE_REDDIT")
 
     twitter_data = fetch_twitter(config)
     if twitter_data:
@@ -590,9 +652,10 @@ def main():
     # Fetch trending topics
     keywords = config.get("trends", {}).get("keywords", [])
     if keywords:
-        reddit_trends = fetch_reddit_trends(keywords)
-        if reddit_trends:
-            trends["reddit"] = reddit_trends
+        if reddit_enabled:
+            reddit_trends = fetch_reddit_trends(keywords)
+            if reddit_trends:
+                trends["reddit"] = reddit_trends
 
         twitter_trends = fetch_twitter_trends(keywords)
         if twitter_trends:

@@ -2,8 +2,8 @@ reddit:
   username: "Tripilot2025"
 
 twitter:
-  username: "TripilotAI"
-  # auth in .env: TWITTER_USERNAME, TWITTER_PASSWORD
+  username: "tripilot_ai"
+  # auth in .env: TWITTER_USERNAME, TWITTER_PASSWORD, TWITTER_EMAIL(optional)
 
 tiktok:
   username: "tripilot.ai"
