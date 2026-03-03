@@ -1,5 +1,643 @@
 {
-  "collected_at": "2026-03-01T14:49:06.081242+00:00",
-  "platforms": {},
-  "trends": {}
+  "collected_at": "2026-03-03T10:09:42.285283+00:00",
+  "platforms": {
+    "reddit": {
+      "account": "Tripilot2025",
+      "profile_url": "https://reddit.com/user/Tripilot2025",
+      "stats": {
+        "post_count": 2,
+        "total_score": 2,
+        "total_comments": 7
+      },
+      "posts": [
+        {
+          "title": "[ Removed by moderator ]",
+          "url": "https://reddit.com/r/chinatravel/comments/1rh5bsr/im_a_local_who_has_lived_in_shanghai_for_5_years/",
+          "subreddit": "chinatravel",
+          "score": 2,
+          "comments": 2,
+          "upvote_ratio": 1.0,
+          "date": "2026-02-28T15:23:31+00:00"
+        },
+        {
+          "title": "I’m building an AI travel agent to help foreigners explore China. AMA",
+          "url": "https://reddit.com/r/travelchina/comments/1on8gx6/im_building_an_ai_travel_agent_to_help_foreigners/",
+          "subreddit": "travelchina",
+          "score": 0,
+          "comments": 5,
+          "upvote_ratio": 0.4,
+          "date": "2025-11-03T10:41:27+00:00"
+        }
+      ]
+    }
+  },
+  "trends": {
+    "reddit": {
+      "keyword_results": [
+        {
+          "keyword": "AI",
+          "title": "\"Cancel ChatGPT\" movement goes big after OpenAI's latest move",
+          "url": "https://reddit.com/r/technology/comments/1rh882s/cancel_chatgpt_movement_goes_big_after_openais/",
+          "subreddit": "technology",
+          "score": 72227,
+          "comments": 2360,
+          "upvote_ratio": 0.94,
+          "date": "2026-02-28T17:18:52+00:00"
+        },
+        {
+          "keyword": "AI",
+          "title": "The dress my ex’s mom sent me to wear to his upcoming wedding.",
+          "url": "https://reddit.com/r/weddingshaming/comments/1rdz6w9/the_dress_my_exs_mom_sent_me_to_wear_to_his/",
+          "subreddit": "weddingshaming",
+          "score": 68752,
+          "comments": 2684,
+          "upvote_ratio": 0.9,
+          "date": "2026-02-25T01:18:18+00:00"
+        },
+        {
+          "keyword": "AI",
+          "title": "AI bad go brrr",
+          "url": "https://reddit.com/r/memes/comments/1rgu2dk/ai_bad_go_brrr/",
+          "subreddit": "memes",
+          "score": 36880,
+          "comments": 285,
+          "upvote_ratio": 0.96,
+          "date": "2026-02-28T05:19:41+00:00"
+        },
+        {
+          "keyword": "AI",
+          "title": "AIs can’t stop recommending nuclear strikes in war game simulations - Leading AIs from OpenAI, Anthropic, and Google opted to use nuclear weapons in simulated war games in 95 per cent of cases",
+          "url": "https://reddit.com/r/technology/comments/1ree20k/ais_cant_stop_recommending_nuclear_strikes_in_war/",
+          "subreddit": "technology",
+          "score": 36243,
+          "comments": 2834,
+          "upvote_ratio": 0.96,
+          "date": "2026-02-25T14:03:33+00:00"
+        },
+        {
+          "keyword": "AI",
+          "title": "\"Cancel ChatGPT\" movement goes mainstream after OpenAI closes deal with U.S. Department of War - as Anthropic refuses to surveil American citizens",
+          "url": "https://reddit.com/r/Futurology/comments/1ri1by8/cancel_chatgpt_movement_goes_mainstream_after/",
+          "subreddit": "Futurology",
+          "score": 36026,
+          "comments": 889,
+          "upvote_ratio": 0.95,
+          "date": "2026-03-01T16:17:16+00:00"
+        },
+        {
+          "keyword": "AI",
+          "title": "You're now training a war machine. Let's see proof of cancellation.",
+          "url": "https://reddit.com/r/ChatGPT/comments/1rgseae/youre_now_training_a_war_machine_lets_see_proof/",
+          "subreddit": "ChatGPT",
+          "score": 32685,
+          "comments": 2467,
+          "upvote_ratio": 0.91,
+          "date": "2026-02-28T03:54:02+00:00"
+        },
+        {
+          "keyword": "AI",
+          "title": "'No ethics at all': the 'cancel ChatGPT' trend is growing after OpenAI signs a deal with the US military",
+          "url": "https://reddit.com/r/technology/comments/1ribnqe/no_ethics_at_all_the_cancel_chatgpt_trend_is/",
+          "subreddit": "technology",
+          "score": 31022,
+          "comments": 825,
+          "upvote_ratio": 0.96,
+          "date": "2026-03-01T22:46:54+00:00"
+        },
+        {
+          "keyword": "AI",
+          "title": "Cancel your ChatGPT Plus, burn their compute on the way out, and switch to Claude",
+          "url": "https://reddit.com/r/ChatGPT/comments/1rh60py/cancel_your_chatgpt_plus_burn_their_compute_on/",
+          "subreddit": "ChatGPT",
+          "score": 28853,
+          "comments": 1869,
+          "upvote_ratio": 0.88,
+          "date": "2026-02-28T15:51:51+00:00"
+        },
+        {
+          "keyword": "AI",
+          "title": "Pope Leo demands priests stop using AI to write sermons over TikTok panic",
+          "url": "https://reddit.com/r/nottheonion/comments/1rfl8x8/pope_leo_demands_priests_stop_using_ai_to_write/",
+          "subreddit": "nottheonion",
+          "score": 25668,
+          "comments": 517,
+          "upvote_ratio": 0.98,
+          "date": "2026-02-26T20:22:33+00:00"
+        },
+        {
+          "keyword": "AI",
+          "title": "OpenAI’s planned cash burn is insane...",
+          "url": "https://reddit.com/r/wallstreetbets/comments/1rdhg4h/openais_planned_cash_burn_is_insane/",
+          "subreddit": "wallstreetbets",
+          "score": 23957,
+          "comments": 1980,
+          "upvote_ratio": 0.97,
+          "date": "2026-02-24T14:18:21+00:00"
+        },
+        {
+          "keyword": "AI",
+          "title": "Trump has turned China into the good guys",
+          "url": "https://reddit.com/r/ImmigrationPathways/comments/1rhzmf4/trump_has_turned_china_into_the_good_guys/",
+          "subreddit": "ImmigrationPathways",
+          "score": 23526,
+          "comments": 3375,
+          "upvote_ratio": 0.85,
+          "date": "2026-03-01T15:10:30+00:00"
+        },
+        {
+          "keyword": "AI",
+          "title": "OC: Elon Musk's makeshift AI power plant generates sound and fury in Mississippi",
+          "url": "https://reddit.com/r/pics/comments/1rfgf1c/oc_elon_musks_makeshift_ai_power_plant_generates/",
+          "subreddit": "pics",
+          "score": 23501,
+          "comments": 933,
+          "upvote_ratio": 0.97,
+          "date": "2026-02-26T17:27:06+00:00"
+        },
+        {
+          "keyword": "AI",
+          "title": "Burger King will use AI to check if employees say ‘please’ and ‘thank you’ | AI chatbot ‘Patty’ is going to live inside employees’ headsets.",
+          "url": "https://reddit.com/r/technology/comments/1rfarv2/burger_king_will_use_ai_to_check_if_employees_say/",
+          "subreddit": "technology",
+          "score": 22314,
+          "comments": 3580,
+          "upvote_ratio": 0.93,
+          "date": "2026-02-26T13:54:57+00:00"
+        },
+        {
+          "keyword": "AI",
+          "title": "Scientists created an exam so broad, challenging and deeply rooted in expert human knowledge that current AI systems consistently fail it. “Humanity’s Last Exam” introduces 2,500 questions spanning mathematics, humanities, natural sciences, ancient languages and highly specialized subfields.",
+          "url": "https://reddit.com/r/science/comments/1rf8m0o/scientists_created_an_exam_so_broad_challenging/",
+          "subreddit": "science",
+          "score": 19804,
+          "comments": 1280,
+          "upvote_ratio": 0.93,
+          "date": "2026-02-26T12:15:57+00:00"
+        },
+        {
+          "keyword": "AI",
+          "title": "Pentagon sets Friday deadline for Anthropic to abandon ethics rules for AI — or else",
+          "url": "https://reddit.com/r/technology/comments/1rdvlsb/pentagon_sets_friday_deadline_for_anthropic_to/",
+          "subreddit": "technology",
+          "score": 19774,
+          "comments": 1210,
+          "upvote_ratio": 0.97,
+          "date": "2026-02-24T22:52:23+00:00"
+        },
+        {
+          "keyword": "AI",
+          "title": "AI has absolutely ruined my life",
+          "url": "https://reddit.com/r/antiwork/comments/1rh20lc/ai_has_absolutely_ruined_my_life/",
+          "subreddit": "antiwork",
+          "score": 18232,
+          "comments": 973,
+          "upvote_ratio": 0.94,
+          "date": "2026-02-28T12:58:45+00:00"
+        },
+        {
+          "keyword": "AI",
+          "title": "Hey, OpenAI: Watch and f****** learn. This is how you stand up to power. [On Anthropics stands against US Pentagon]",
+          "url": "https://reddit.com/r/ChatGPT/comments/1rgjqa9/hey_openai_watch_and_f_learn_this_is_how_you/",
+          "subreddit": "ChatGPT",
+          "score": 17801,
+          "comments": 1431,
+          "upvote_ratio": 0.92,
+          "date": "2026-02-27T21:37:41+00:00"
+        },
+        {
+          "keyword": "AI",
+          "title": "All my public homies use library",
+          "url": "https://reddit.com/r/dontdeadopeninside/comments/1reps5a/all_my_public_homies_use_library/",
+          "subreddit": "dontdeadopeninside",
+          "score": 16895,
+          "comments": 87,
+          "upvote_ratio": 0.96,
+          "date": "2026-02-25T21:02:32+00:00"
+        },
+        {
+          "keyword": "AI",
+          "title": "The White House's official TikTok posted an AI video of U.S. hockey star Brady Tkachuk calling Canadians \"maple syrup eating f***s.\" Tkachuk addressed the video: \"It's not my voice. It's not what I was saying. I would never say that. That's not who I am.",
+          "url": "https://reddit.com/r/sportsgossips/comments/1rg7z66/the_white_houses_official_tiktok_posted_an_ai/",
+          "subreddit": "sportsgossips",
+          "score": 16397,
+          "comments": 1196,
+          "upvote_ratio": 0.97,
+          "date": "2026-02-27T14:21:25+00:00"
+        },
+        {
+          "keyword": "AI",
+          "title": "Claude down: Anthropic AI not working in major outage",
+          "url": "https://reddit.com/r/technology/comments/1risumw/claude_down_anthropic_ai_not_working_in_major/",
+          "subreddit": "technology",
+          "score": 16092,
+          "comments": 1299,
+          "upvote_ratio": 0.95,
+          "date": "2026-03-02T13:29:42+00:00"
+        },
+        {
+          "keyword": "China Travel",
+          "title": "Lishui Airport - Zhejiang, China by MAD Architects (2024)",
+          "url": "https://reddit.com/r/architecture/comments/1rj4d5s/lishui_airport_zhejiang_china_by_mad_architects/",
+          "subreddit": "architecture",
+          "score": 2787,
+          "comments": 58,
+          "upvote_ratio": 0.98,
+          "date": "2026-03-02T20:34:38+00:00"
+        },
+        {
+          "keyword": "China Travel",
+          "title": "19,000 KMs solo drive across the Himalayas",
+          "url": "https://reddit.com/r/SoloTravel_India/comments/1reauqh/19000_kms_solo_drive_across_the_himalayas/",
+          "subreddit": "SoloTravel_India",
+          "score": 2081,
+          "comments": 139,
+          "upvote_ratio": 1.0,
+          "date": "2026-02-25T11:35:42+00:00"
+        },
+        {
+          "keyword": "AI Travel",
+          "title": "Now isn't this beautiful",
+          "url": "https://reddit.com/r/dubai/comments/1rhw9fr/now_isnt_this_beautiful/",
+          "subreddit": "dubai",
+          "score": 1489,
+          "comments": 85,
+          "upvote_ratio": 0.98,
+          "date": "2026-03-01T12:37:46+00:00"
+        },
+        {
+          "keyword": "AI Travel",
+          "title": "Amazing leadership tbh",
+          "url": "https://reddit.com/r/UAE/comments/1rhw9yy/amazing_leadership_tbh/",
+          "subreddit": "UAE",
+          "score": 1425,
+          "comments": 95,
+          "upvote_ratio": 0.95,
+          "date": "2026-03-01T12:38:33+00:00"
+        },
+        {
+          "keyword": "China Travel",
+          "title": "My mom has cancer, our experience with healthcare in Calgary so far",
+          "url": "https://reddit.com/r/Calgary/comments/1rh4wvb/my_mom_has_cancer_our_experience_with_healthcare/",
+          "subreddit": "Calgary",
+          "score": 882,
+          "comments": 313,
+          "upvote_ratio": 0.91,
+          "date": "2026-02-28T15:06:14+00:00"
+        },
+        {
+          "keyword": "AI Travel",
+          "title": "Took 5 years but I did it.  Today is my last day at work!",
+          "url": "https://reddit.com/r/fatFIRE/comments/1rfhy7a/took_5_years_but_i_did_it_today_is_my_last_day_at/",
+          "subreddit": "fatFIRE",
+          "score": 620,
+          "comments": 110,
+          "upvote_ratio": 0.97,
+          "date": "2026-02-26T18:21:21+00:00"
+        },
+        {
+          "keyword": "AI Travel",
+          "title": "Custom Origins Codex",
+          "url": "https://reddit.com/r/dragonage/comments/1rfntmf/custom_origins_codex/",
+          "subreddit": "dragonage",
+          "score": 554,
+          "comments": 31,
+          "upvote_ratio": 1.0,
+          "date": "2026-02-26T21:58:29+00:00"
+        },
+        {
+          "keyword": "AI Travel",
+          "title": "Another pitch for a new Bioshock game!",
+          "url": "https://reddit.com/r/Bioshock/comments/1rdg5xz/another_pitch_for_a_new_bioshock_game/",
+          "subreddit": "Bioshock",
+          "score": 539,
+          "comments": 53,
+          "upvote_ratio": 0.95,
+          "date": "2026-02-24T13:25:20+00:00"
+        },
+        {
+          "keyword": "AI Travel",
+          "title": "Hyatt deval is a slap in the face and I'm tired of hearing that \"we've had it too good for too long\"",
+          "url": "https://reddit.com/r/hyatt/comments/1relau6/hyatt_deval_is_a_slap_in_the_face_and_im_tired_of/",
+          "subreddit": "hyatt",
+          "score": 516,
+          "comments": 174,
+          "upvote_ratio": 0.94,
+          "date": "2026-02-25T18:23:10+00:00"
+        },
+        {
+          "keyword": "China Travel",
+          "title": "Es kracht dieses Weekend aber nicht im Depot",
+          "url": "https://reddit.com/r/wallstreetbetsGER/comments/1rgez5b/es_kracht_dieses_weekend_aber_nicht_im_depot/",
+          "subreddit": "wallstreetbetsGER",
+          "score": 511,
+          "comments": 57,
+          "upvote_ratio": 0.98,
+          "date": "2026-02-27T18:38:14+00:00"
+        },
+        {
+          "keyword": "AI Travel",
+          "title": "Drop in Incoming tourist in India",
+          "url": "https://reddit.com/r/india_tourism/comments/1rfug88/drop_in_incoming_tourist_in_india/",
+          "subreddit": "india_tourism",
+          "score": 479,
+          "comments": 66,
+          "upvote_ratio": 0.98,
+          "date": "2026-02-27T02:34:27+00:00"
+        },
+        {
+          "keyword": "China Travel",
+          "title": "What places do you wanna see in Wolfenstein 3 ?",
+          "url": "https://reddit.com/r/Wolfenstein/comments/1rhqzud/what_places_do_you_wanna_see_in_wolfenstein_3/",
+          "subreddit": "Wolfenstein",
+          "score": 460,
+          "comments": 106,
+          "upvote_ratio": 1.0,
+          "date": "2026-03-01T07:24:27+00:00"
+        },
+        {
+          "keyword": "AI Travel",
+          "title": "ik🇺🇦ihe",
+          "url": "https://reddit.com/r/ik_ihe/comments/1rfcnrh/ikihe/",
+          "subreddit": "ik_ihe",
+          "score": 459,
+          "comments": 33,
+          "upvote_ratio": 0.99,
+          "date": "2026-02-26T15:10:18+00:00"
+        },
+        {
+          "keyword": "AI Travel",
+          "title": "here is a list I don't think you have read.(10 out of 10) I am from bilibili",
+          "url": "https://reddit.com/r/noveltranslations/comments/1rdjmvw/here_is_a_list_i_dont_think_you_have_read10_out/",
+          "subreddit": "noveltranslations",
+          "score": 431,
+          "comments": 51,
+          "upvote_ratio": 0.99,
+          "date": "2026-02-24T15:42:42+00:00"
+        },
+        {
+          "keyword": "China Travel",
+          "title": "Recently finished project using QGIS and Illustrator. Hope you enjoy it!",
+          "url": "https://reddit.com/r/gis/comments/1rdlqln/recently_finished_project_using_qgis_and/",
+          "subreddit": "gis",
+          "score": 407,
+          "comments": 32,
+          "upvote_ratio": 0.99,
+          "date": "2026-02-24T16:58:27+00:00"
+        },
+        {
+          "keyword": "China Travel",
+          "title": "That's when you realize some people who insist on using \"Lunar New Year\", and hate the term \"Chinese New Year\" just have Sinophobia.",
+          "url": "https://reddit.com/r/Sino/comments/1rf6m6v/thats_when_you_realize_some_people_who_insist_on/",
+          "subreddit": "Sino",
+          "score": 357,
+          "comments": 19,
+          "upvote_ratio": 0.98,
+          "date": "2026-02-26T10:23:40+00:00"
+        },
+        {
+          "keyword": "AI Travel",
+          "title": "Achieving an \"illustration\" mood with architecture photography",
+          "url": "https://reddit.com/r/postprocessing/comments/1rfjhf3/achieving_an_illustration_mood_with_architecture/",
+          "subreddit": "postprocessing",
+          "score": 355,
+          "comments": 31,
+          "upvote_ratio": 0.98,
+          "date": "2026-02-26T19:17:01+00:00"
+        },
+        {
+          "keyword": "AI Travel",
+          "title": "He’s definitely getting fired",
+          "url": "https://reddit.com/r/recontext/comments/1rft1ti/hes_definitely_getting_fired/",
+          "subreddit": "recontext",
+          "score": 349,
+          "comments": 3,
+          "upvote_ratio": 1.0,
+          "date": "2026-02-27T01:31:27+00:00"
+        },
+        {
+          "keyword": "China Travel",
+          "title": "That's when you realize some people who insist on using \"Lunar New Year\", and hate the term \"Chinese New Year\" just have Sinophobia.",
+          "url": "https://reddit.com/r/TankieTheDeprogram/comments/1rf6mbk/thats_when_you_realize_some_people_who_insist_on/",
+          "subreddit": "TankieTheDeprogram",
+          "score": 345,
+          "comments": 30,
+          "upvote_ratio": 0.97,
+          "date": "2026-02-26T10:23:53+00:00"
+        },
+        {
+          "keyword": "AI Travel",
+          "title": "Zhangjiajie in 3 days/2 nights – Chinese local’s plan for Avatar peaks, Tianmen and the Grand Canyon",
+          "url": "https://reddit.com/r/travelchina/comments/1rg1ib9/zhangjiajie_in_3_days2_nights_chinese_locals_plan/",
+          "subreddit": "travelchina",
+          "score": 336,
+          "comments": 18,
+          "upvote_ratio": 0.99,
+          "date": "2026-02-27T08:50:56+00:00"
+        },
+        {
+          "keyword": "China Travel",
+          "title": "I just spent 21 days traveling in China as a foreigner. Here’s what actually surprised me.",
+          "url": "https://reddit.com/r/chinatravel/comments/1rg4mjy/i_just_spent_21_days_traveling_in_china_as_a/",
+          "subreddit": "chinatravel",
+          "score": 319,
+          "comments": 171,
+          "upvote_ratio": 0.86,
+          "date": "2026-02-27T11:51:07+00:00"
+        },
+        {
+          "keyword": "AI Travel",
+          "title": "The worst inflight food I have ever had",
+          "url": "https://reddit.com/r/AirTravelIndia/comments/1rebukl/the_worst_inflight_food_i_have_ever_had/",
+          "subreddit": "AirTravelIndia",
+          "score": 317,
+          "comments": 53,
+          "upvote_ratio": 0.9,
+          "date": "2026-02-25T12:26:53+00:00"
+        },
+        {
+          "keyword": "China Travel",
+          "title": "Snow trails on 3000m+ mountain area",
+          "url": "https://reddit.com/r/trailrunning/comments/1rg7kol/snow_trails_on_3000m_mountain_area/",
+          "subreddit": "trailrunning",
+          "score": 310,
+          "comments": 9,
+          "upvote_ratio": 1.0,
+          "date": "2026-02-27T14:05:04+00:00"
+        },
+        {
+          "keyword": "China Travel",
+          "title": "Pictures of China",
+          "url": "https://reddit.com/r/SonyAlpha/comments/1rfaiq1/pictures_of_china/",
+          "subreddit": "SonyAlpha",
+          "score": 302,
+          "comments": 12,
+          "upvote_ratio": 0.99,
+          "date": "2026-02-26T13:44:12+00:00"
+        },
+        {
+          "keyword": "China Travel",
+          "title": "Complete analysis of the war in Iran",
+          "url": "https://reddit.com/r/KrakenStockResearch/comments/1riimia/complete_analysis_of_the_war_in_iran/",
+          "subreddit": "KrakenStockResearch",
+          "score": 300,
+          "comments": 54,
+          "upvote_ratio": 0.96,
+          "date": "2026-03-02T04:00:26+00:00"
+        },
+        {
+          "keyword": "AI Travel",
+          "title": "37yo watches The Terminator [1984] for the first time",
+          "url": "https://reddit.com/r/iwatchedanoldmovie/comments/1renkjq/37yo_watches_the_terminator_1984_for_the_first/",
+          "subreddit": "iwatchedanoldmovie",
+          "score": 295,
+          "comments": 275,
+          "upvote_ratio": 0.91,
+          "date": "2026-02-25T19:42:08+00:00"
+        },
+        {
+          "keyword": "China Travel",
+          "title": "3DS is still the best gaming device while travelling",
+          "url": "https://reddit.com/r/3DS/comments/1rha0dl/3ds_is_still_the_best_gaming_device_while/",
+          "subreddit": "3DS",
+          "score": 286,
+          "comments": 36,
+          "upvote_ratio": 0.97,
+          "date": "2026-02-28T18:27:47+00:00"
+        },
+        {
+          "keyword": "China Travel",
+          "title": "Another haul... (aka I'm losing control over my life)",
+          "url": "https://reddit.com/r/tamagotchi/comments/1ricnd2/another_haul_aka_im_losing_control_over_my_life/",
+          "subreddit": "tamagotchi",
+          "score": 276,
+          "comments": 20,
+          "upvote_ratio": 0.98,
+          "date": "2026-03-01T23:27:25+00:00"
+        },
+        {
+          "keyword": "AI Travel",
+          "title": "Today I felt utterly humilated because of IRCTC and their lack of competence.",
+          "url": "https://reddit.com/r/indiasocial/comments/1rdyp5n/today_i_felt_utterly_humilated_because_of_irctc/",
+          "subreddit": "indiasocial",
+          "score": 275,
+          "comments": 36,
+          "upvote_ratio": 0.97,
+          "date": "2026-02-25T00:57:17+00:00"
+        },
+        {
+          "keyword": "AI Travel",
+          "title": "[HELP] Is this AI? Husband is saying he bought new food for the cats (I am traveling for work)",
+          "url": "https://reddit.com/r/RealOrAI/comments/1rcyr00/help_is_this_ai_husband_is_saying_he_bought_new/",
+          "subreddit": "RealOrAI",
+          "score": 270,
+          "comments": 367,
+          "upvote_ratio": 0.68,
+          "date": "2026-02-24T00:11:20+00:00"
+        },
+        {
+          "keyword": "AI Travel",
+          "title": "IIM B’s PI @ Taj Kolkata, 27/02",
+          "url": "https://reddit.com/r/CATpreparation/comments/1rgfasa/iim_bs_pi_taj_kolkata_2702/",
+          "subreddit": "CATpreparation",
+          "score": 263,
+          "comments": 51,
+          "upvote_ratio": 0.98,
+          "date": "2026-02-27T18:49:43+00:00"
+        },
+        {
+          "keyword": "China Travel",
+          "title": "How China Is Stoking Fear About Travel to Japan: From earthquake warnings to bear attack alerts, Beijing is deploying a campaign of exaggeration and disinformation to punish Tokyo’s support for Taiwan.",
+          "url": "https://reddit.com/r/taiwan/comments/1rdq5ch/how_china_is_stoking_fear_about_travel_to_japan/",
+          "subreddit": "taiwan",
+          "score": 256,
+          "comments": 54,
+          "upvote_ratio": 0.82,
+          "date": "2026-02-24T19:33:40+00:00"
+        },
+        {
+          "keyword": "China Travel",
+          "title": "I don't know her but I agree with her",
+          "url": "https://reddit.com/r/AI_India/comments/1rhp3ih/i_dont_know_her_but_i_agree_with_her/",
+          "subreddit": "AI_India",
+          "score": 251,
+          "comments": 18,
+          "upvote_ratio": 0.96,
+          "date": "2026-03-01T05:36:09+00:00"
+        },
+        {
+          "keyword": "China Travel",
+          "title": "MODI Israel Meet",
+          "url": "https://reddit.com/r/CriticalThinkingIndia/comments/1re8crx/modi_israel_meet/",
+          "subreddit": "CriticalThinkingIndia",
+          "score": 248,
+          "comments": 187,
+          "upvote_ratio": 0.81,
+          "date": "2026-02-25T09:08:41+00:00"
+        },
+        {
+          "keyword": "AI Travel",
+          "title": "I don't know her but I agree with her",
+          "url": "https://reddit.com/r/AI_India/comments/1rhp3ih/i_dont_know_her_but_i_agree_with_her/",
+          "subreddit": "AI_India",
+          "score": 245,
+          "comments": 18,
+          "upvote_ratio": 0.96,
+          "date": "2026-03-01T05:36:09+00:00"
+        },
+        {
+          "keyword": "AI Travel",
+          "title": "Struggles of a non-native speaker",
+          "url": "https://reddit.com/r/Drizzt/comments/1rf9f3z/struggles_of_a_nonnative_speaker/",
+          "subreddit": "Drizzt",
+          "score": 242,
+          "comments": 42,
+          "upvote_ratio": 0.99,
+          "date": "2026-02-26T12:55:43+00:00"
+        },
+        {
+          "keyword": "AI Travel",
+          "title": "Anyone enjoying their job at the moment?",
+          "url": "https://reddit.com/r/ExperiencedDevs/comments/1red70d/anyone_enjoying_their_job_at_the_moment/",
+          "subreddit": "ExperiencedDevs",
+          "score": 234,
+          "comments": 198,
+          "upvote_ratio": 0.93,
+          "date": "2026-02-25T13:27:49+00:00"
+        },
+        {
+          "keyword": "China Travel",
+          "title": "On Idrila",
+          "url": "https://reddit.com/r/StarRailLore/comments/1reqd9y/on_idrila/",
+          "subreddit": "StarRailLore",
+          "score": 230,
+          "comments": 4,
+          "upvote_ratio": 0.99,
+          "date": "2026-02-25T21:24:09+00:00"
+        },
+        {
+          "keyword": "China Travel",
+          "title": "What is this, some kind of Red World?",
+          "url": "https://reddit.com/r/imaginaryelections/comments/1rd4yt8/what_is_this_some_kind_of_red_world/",
+          "subreddit": "imaginaryelections",
+          "score": 229,
+          "comments": 23,
+          "upvote_ratio": 1.0,
+          "date": "2026-02-24T04:11:09+00:00"
+        },
+        {
+          "keyword": "China Travel",
+          "title": "Shanghai Miniso",
+          "url": "https://reddit.com/r/BubuAndDudu/comments/1rdfzq3/shanghai_miniso/",
+          "subreddit": "BubuAndDudu",
+          "score": 198,
+          "comments": 9,
+          "upvote_ratio": 1.0,
+          "date": "2026-02-24T13:17:29+00:00"
+        }
+      ],
+      "stats": {
+        "post_count": 60
+      }
+    }
+  }
 }

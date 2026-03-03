@@ -46,8 +46,6 @@ jobs:
 
       - name: Run collector
         id: collector
-        env:
-          DISABLE_REDDIT: "true"
         run: |
           set +e
           python collector.py
