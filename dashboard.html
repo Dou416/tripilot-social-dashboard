@@ -476,6 +476,18 @@ tbody tr:last-child td {
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-sm);
   padding: 12px 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.keyword-card:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--border-light);
+}
+
+.keyword-card.active {
+  background: rgba(0, 242, 234, 0.08);
+  border-color: var(--tiktok);
 }
 
 .keyword-title {
@@ -908,7 +920,7 @@ tbody tr:last-child td {
         </div>`;
     } else {
       keywordGrid.innerHTML = sortedKeywords.map(([keyword, stats]) => `
-        <div class="keyword-card">
+        <div class="keyword-card" data-keyword="${escHtml(keyword)}">
           <div class="keyword-title">${escHtml(keyword)}</div>
           <div class="keyword-meta">${fmt(stats.mentions)} mentions | ${fmt(stats.engagement)} engagement</div>
         </div>
@@ -917,13 +929,32 @@ tbody tr:last-child td {
 
     // ── Trend table ──
     let trendFilter = 'all';
+    let keywordFilter = 'all';
     let trendSortCol = 'date';
     let trendSortDir = -1;
 
+    keywordGrid.addEventListener('click', (e) => {
+      const card = e.target.closest('.keyword-card[data-keyword]');
+      if (!card) return;
+      const kw = card.dataset.keyword;
+      if (keywordFilter === kw) {
+        keywordFilter = 'all';
+        card.classList.remove('active');
+      } else {
+        keywordGrid.querySelectorAll('.keyword-card').forEach(c => c.classList.remove('active'));
+        keywordFilter = kw;
+        card.classList.add('active');
+      }
+      renderTrendTable();
+    });
+
     function renderTrendTable() {
-      const filtered = trendFilter === 'all'
+      let filtered = trendFilter === 'all'
         ? allTrendRows
         : allTrendRows.filter(p => p.platform === trendFilter);
+      if (keywordFilter !== 'all') {
+        filtered = filtered.filter(p => p.keyword === keywordFilter);
+      }
 
       const sorted = [...filtered].sort((a, b) => {
         let va, vb;
